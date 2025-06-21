@@ -1,4 +1,4 @@
-This source code is for the paper: “Cross-domain Recommendation via Quantized Disentangled Generative Model” submited to Knowledge and Information Systems by Yi Zhao,Le Chen, Jibing Gong and et.al.
+This source code is for the paper: “Cross-domain Recommendation via Quantized Disentangled Generative Model” submited to Information Fusion by Yi Zhao,Le Chen, Jibing Gong and et.al.
 
 Requirements
 ---
