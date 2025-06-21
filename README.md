@@ -1,4 +1,4 @@
-This source code is for the paper: “Cross Domain Recommendation via Adaptive Bi-directional Transfer Graph Neural Networks” submited to Knowledge and Information Systems by Yi Zhao,Jinxin Ju Jibing Gong and et.al.
+This source code is for the paper: “Cross-domain Recommendation via Quantized Disentangled Generative Model” submited to Knowledge and Information Systems by Yi Zhao,Le Chen, Jibing Gong and et.al.
 
 Requirements
 ---
