@@ -14,7 +14,7 @@ Numpy = 1.19.1
 Usage
 ---
 
-To run this project, please make sure that you have the following packages being downloaded. Our experiments are conducted on a PC with an Intel Xeon E5 2.1GHz CPU, 256 RAM and a Tesla V100 32GB GPU. 
+To run this project, please make sure that you have the following packages being downloaded. 
 
 Running example:
 
