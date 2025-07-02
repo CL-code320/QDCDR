@@ -140,28 +140,6 @@ class QdTrainer(Trainer):
         y = 1 - x
         return torch.cat((x,y), dim = -1)
     
-    def L_d(self, a, R):
-        """ 定义损失函数 L_d，这里假设使用均方误差 """
-        return torch.nn.functional.mse_loss(a, R)
-    
-    def compute_LFN(self, Xs, Xt, R):
-        """
-            计算公式中的 LFN 损失
-            Xs: 源域样本 (Ns, d) 的 Tensor
-            Xt: 目标域样本 (Nt, d) 的 Tensor
-            R:  标量 Tensor，表示对比的目标值
-        """
-        Ns = Xs.shape[0]
-        Nt = Xt.shape[0]
-        device = Xs.device
-        R = R.to(device)
-        # 计算源域和目标域的平方范数均值
-        mean_norm_Xs = torch.mean(torch.norm(Xs, dim=1, p=2) ** 2).to(device)  # 计算 ||xi||^2 的均值
-        mean_norm_Xt = torch.mean(torch.norm(Xt, dim=1, p=2) ** 2).to(device)  # 计算 ||xj||^2 的均值
-
-        # 计算两个 L_d 损失
-        loss = self.L_d(mean_norm_Xs, R) + self.L_d(mean_norm_Xt, R)
-        return loss
 
 
     def reconstruct_graph(self, batch, source_UV, source_VU, target_UV, target_VU, share_UV, share_VU, source_adj=None, target_adj=None, epoch = 100):
@@ -206,16 +184,7 @@ class QdTrainer(Trainer):
             lambda_norm = self.lambda_kl  # 范数约束的权重超参数
             norm_loss = lambda_norm * torch.abs(norm_E1 - norm_E2)
 
-            # mu_source = self.source_item.mean(dim=0)
-            # sigma_source = self.source_item.var(dim=0)
-            # mu_target = self.target_item.mean(dim=0)
-            # sigma_target = self.target_item.var(dim=0)
- 
-            # kl_loss = torch.sum(sigma_source / sigma_target + (mu_target - mu_source)**2 / sigma_target - 1 + torch.log(sigma_target / sigma_source))
-            # lambda_kl = self.lambda_kl
-            # kl_loss = lambda_kl * kl_loss
         else:
-            # kl_loss = 0
             norm_loss = 0
 
         if self.opt["cuda"]:

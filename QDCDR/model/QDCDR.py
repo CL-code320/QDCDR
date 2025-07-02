@@ -185,22 +185,22 @@ class QDCDR(nn.Module):
         
     def compute_average_true_false(self, shared_mask: torch.Tensor):
         """
-        计算 shared_mask 中每个用户的平均 True（共享样本）和 False（不共享样本）数量。
+        Calculate the average number of True (shared samples) and False (non-shared samples) per user in shared_mask.
 
-        参数：
-            shared_mask (torch.Tensor): 形状为 (B, Z) 的布尔张量，每个用户对应一个 True/False 向量。
+        Args:
+            shared_mask (torch.Tensor): Boolean tensor of shape (B, Z), where each user corresponds to a True/False vector.
 
-        返回：
-            avg_true (float): 平均 True 的个数
-            avg_false (float): 平均 False 的个数
+        Returns:
+            avg_true (float): Average number of True values
+            avg_false (float): Average number of False values
         """
-        # 计算每个用户的 True 数量
+        # Calculate the number of True values for each user
         num_true_per_user = shared_mask.sum(dim=1)  # (B,)
 
-        # 计算每个用户的 False 数量
+        # Calculate the number of False values for each user
         num_false_per_user = (~shared_mask).sum(dim=1)  # (B,)
 
-        # 计算平均值
+        # Calculate the averages
         avg_true = num_true_per_user.float().mean().item()
         avg_false = num_false_per_user.float().mean().item()
 
@@ -212,7 +212,7 @@ class QDCDR(nn.Module):
         share_user = self.share_user_embedding(self.user_index)
         source_item = self.source_item_embedding(self.source_item_index)
         target_item = self.target_item_embedding(self.target_item_index)
-        share_item = torch.cat([source_item, target_item], dim=0)  # 形状 [source_item_num + target_item_num, feature_dim]
+        share_item = torch.cat([source_item, target_item], dim=0)  #  [source_item_num + target_item_num, feature_dim]
 
         source_learn_specific_user, source_learn_specific_item = self.source_specific_GNN(source_user, source_item, source_UV, source_VU)
         target_learn_specific_user, target_learn_specific_item = self.target_specific_GNN(target_user, target_item, target_UV, target_VU)
@@ -258,7 +258,7 @@ class QDCDR(nn.Module):
         source_item = self.source_item_embedding(self.source_item_index)
         target_item = self.target_item_embedding(self.target_item_index)
         share_user = self.share_user_embedding(self.user_index)
-        share_item = torch.cat([source_item, target_item], dim=0)  # 形状 [source_item_num + target_item_num, feature_dim]
+        share_item = torch.cat([source_item, target_item], dim=0)  #  [source_item_num + target_item_num, feature_dim]
 
         source_learn_specific_user, source_learn_specific_item = self.source_specific_GNN(source_user, source_item,
                                                                                           source_UV, source_VU)

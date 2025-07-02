@@ -83,30 +83,31 @@ class DataLoader(object):
         shared_train_data = []
         shared_test_data = []
 
-        # 处理共享域训练数据
+        # Merge source domain training data directly
         for user, item in self.source_train_data:
-            shared_train_data.append([user, item])  # source 数据直接加入共享数据中
+            shared_train_data.append([user, item])  # Source data is added as is
+        # Merge target domain training data with item ID offset
         for user, item in self.target_train_data:
-            shared_train_data.append([user, item + opt["source_item_num"]])  # target 数据加上 item 偏移
+            shared_train_data.append([user, item + opt["source_item_num"]])  # Offset target item IDs
 
-        # 处理共享域测试数据
+        # Merge source domain test data directly
         for user, item_list in self.source_test_data:
-            shared_test_data.append([user, item_list])  # source 数据直接加入共享测试数据中
+            shared_test_data.append([user, item_list])  # Source test data is added as is
+        # Merge target domain test data with item ID offset for each item
         for user, item_list in self.target_test_data:
-            # target 数据的每个 item 加上 item 偏移
-            shifted_item_list = [item + opt["source_item_num"] for item in item_list]
+            shifted_item_list = [item + opt["source_item_num"] for item in item_list]  # Offset each target item ID
             shared_test_data.append([user, shifted_item_list])
 
-        # 合并 source 和 target 的 ma_set 和 ma_list(注意这里一定要使用深拷贝，不然内部还是引用的形式传递会改变source_ma_list的内容)
-        # shared_ma_set = self.source_ma_set.copy()
-        # shared_ma_list = self.source_ma_list.copy()
+        # Deep copy source ma_set and ma_list to avoid reference issues
         shared_ma_set = copy.deepcopy(self.source_ma_set)
         shared_ma_list = copy.deepcopy(self.source_ma_list)
+        # Merge target ma_set and ma_list, offsetting item IDs
         for user, items in self.target_ma_set.items():
             if user not in shared_ma_set:
                 shared_ma_set[user] = set()
                 shared_ma_list[user] = []
             shared_ma_set[user].update(items)
+            # Offset each target item ID before extending the list
             shared_ma_list[user].extend([item + opt["source_item_num"] for item in items])
 
         return shared_ma_set, shared_ma_list, shared_train_data, shared_test_data
@@ -121,30 +122,32 @@ class DataLoader(object):
             ma = {}
             ma_list = {}
             for line in infile:
-                line=line.strip().split("\t")
+                line = line.strip().split("\t")
                 line[0] = int(line[0])
                 line[1] = int(line[1])
-                if user.get(line[0], "zxczxc") == "zxczxc":
+                # Use more pythonic way to check and assign new user/item IDs
+                if line[0] not in user:
                     user[line[0]] = len(user)
-                if item.get(line[1], "zxczxc") == "zxczxc":
+                if line[1] not in item:
                     item[line[1]] = len(item)
                 line[0] = user[line[0]]
                 line[1] = item[line[1]]
-                train_data.append([line[0],line[1]])
+                train_data.append([line[0], line[1]])
                 if line[0] not in ma:
                     ma[line[0]] = set()
                     ma_list[line[0]] = []
                 ma[line[0]].add(line[1])
                 ma_list[line[0]].append(line[1])
-        with codecs.open(test_file,"r",encoding="utf-8") as infile:
-            test_data=[]
+        with codecs.open(test_file, "r", encoding="utf-8") as infile:
+            test_data = []
             for line in infile:
-                line=line.strip().split("\t")
+                line = line.strip().split("\t")
                 line[0] = int(line[0])
                 line[1] = int(line[1])
-                if user.get(line[0], "zxczxc") == "zxczxc":
+                # Skip if user or item not in training set
+                if line[0] not in user:
                     continue
-                if item.get(line[1], "zxczxc") == "zxczxc":
+                if line[1] not in item:
                     continue
                 line[0] = user[line[0]]
                 line[1] = item[line[1]]
@@ -152,12 +155,12 @@ class DataLoader(object):
                 ret = [line[1]]
                 for i in range(999):
                     while True:
-                        rand = random.randint(0, len(item)-1)
+                        rand = random.randint(0, len(item) - 1)
                         if rand in ma[line[0]]:
                             continue
                         ret.append(rand)
                         break
-                test_data.append([line[0],ret])
+                test_data.append([line[0], ret])
 
         return ma, ma_list, train_data, test_data, user, item
 
